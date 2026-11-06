@@ -18,7 +18,7 @@ cp .env.example .env
 uv sync
 ```
 
-The quickest way to run the search is to download the built catalogue and index, about 25 MB, which needs no scrape and no paid build. The file is checked against `data-release.sha256` before anything is unpacked:
+The quickest way to run the search is to download the built catalogue and index, about 23 MB, which needs no scrape and no paid build. The file is checked against `data-release.sha256` before anything is unpacked:
 
 ```bash
 uv run curated download
