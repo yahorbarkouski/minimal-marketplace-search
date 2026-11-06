@@ -1,0 +1,16 @@
+.env
+.env.*
+.venv
+.claude
+.pytest_cache
+.ruff_cache
+__pycache__
+data/raw
+data/photos
+data/runs
+data/cache
+data/ledger.jsonl
+web
+tests
+scripts
+README.md

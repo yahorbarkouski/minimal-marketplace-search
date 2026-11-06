@@ -1,0 +1,455 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-site), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --font-heading: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-card-foreground-muted: var(--card-foreground-muted);
+  /* The ink scale and washes as Tailwind colours, so components can write `text-ink-6`. */
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-ink-5: var(--ink-5);
+  --color-ink-6: var(--ink-6);
+  --color-wash: var(--wash);
+  --color-wash-strong: var(--wash-strong);
+  --color-hairline: var(--hairline);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Bencho's palette: one ink at a few strengths on white, and a 6% wash of it for every surface. */
+:root {
+  --ink: #17181a;
+  --ink-rgb: 23 24 26;
+  --ink-2: #3c3b37;
+  --ink-3: #5c5b56;
+  --ink-4: #6f6e68;
+  --ink-5: #85847e;
+  --ink-6: #a3a29c;
+  --wash: rgb(var(--ink-rgb) / 0.06);
+  --wash-strong: rgb(var(--ink-rgb) / 0.09);
+  --hairline: rgb(var(--ink-rgb) / 0.12);
+
+  /* A press that overshoots a little, a hover that pops, and a calm ease for everything else. */
+  --spring: cubic-bezier(0.28, 1.4, 0.36, 1);
+  --pop: cubic-bezier(0.3, 1.12, 0.4, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.33, 0.55, 0.2, 1);
+
+  --radius: 1.25rem;
+  --background: #fff;
+  --foreground: var(--ink);
+  --card: #fff;
+  --card-foreground: var(--ink);
+  --card-foreground-muted: var(--ink-5);
+  --popover: #fff;
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: #fff;
+  --secondary: var(--wash);
+  --secondary-foreground: var(--ink-2);
+  --muted: var(--wash);
+  --muted-foreground: var(--ink-5);
+  --accent: var(--wash);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.577 0.2 27.3);
+  --border: rgb(var(--ink-rgb) / 0.1);
+  --input: rgb(var(--ink-rgb) / 0.12);
+  --ring: rgb(var(--ink-rgb) / 0.25);
+  --on: oklch(0.6 0.13 150);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    background-color: var(--background);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* The scrollbar's room is kept on every page, so nothing shifts when a long page brings the scrollbar in or a
+       dialog locks scrolling and takes it away. */
+    scrollbar-gutter: stable;
+  }
+
+  /* The dialogs' scroll lock pads the page by the scrollbar's width to make up for hiding it; the reserved room
+     already does, so the padding would only push the page sideways. */
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+
+  body {
+    @apply bg-background font-sans;
+    color: var(--ink);
+  }
+
+  ::selection {
+    background: rgb(var(--ink-rgb) / 0.12);
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(var(--ink-rgb) / 0.14);
+  }
+}
+
+@layer components {
+  /* The search box: a wash pill that darkens while it has focus, and floats as frosted glass in the bar. */
+  /* The page has one search box, on the start page or in the bar; the shared name lets a view transition glide it. */
+  .find {
+    view-transition-name: search;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 6px 0 18px;
+    border-radius: 999px;
+    background: var(--wash);
+    color: var(--ink-4);
+    transition:
+      background 0.16s,
+      box-shadow 0.24s var(--ease-soft),
+      height 0.24s var(--ease-soft);
+  }
+  .find:focus-within {
+    background: var(--wash-strong);
+  }
+  .find input {
+    min-width: 0;
+    flex: 1;
+    height: 100%;
+    border: 0;
+    background: none;
+    outline: none;
+    box-shadow: none;
+    color: var(--ink);
+    font-size: 15px;
+  }
+  .find input::placeholder {
+    color: var(--ink-6);
+  }
+  .find[data-size="hero"] {
+    height: 56px;
+    padding-left: 22px;
+  }
+  .find[data-size="hero"] input {
+    font-size: 16px;
+  }
+
+  /* The dark pill button; it gives a little under the finger and springs back. */
+  .cta {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 15px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      opacity 0.14s,
+      scale 0.2s var(--spring),
+      background 0.16s;
+  }
+  .cta:hover {
+    opacity: 0.88;
+  }
+  .cta:active {
+    scale: 0.94;
+  }
+  .cta:disabled {
+    cursor: default;
+    opacity: 1;
+    scale: 1;
+    background: rgb(var(--ink-rgb) / 0.14);
+  }
+  .cta[data-round] {
+    width: 36px;
+    padding: 0;
+  }
+  .find[data-size="hero"] .cta[data-round] {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* A wash pill for secondary actions and labels; the ink slab marks the one that is on. */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 15px;
+    border-radius: 999px;
+    background: var(--wash);
+    color: var(--ink-2);
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.16s,
+      color 0.16s,
+      scale 0.2s var(--spring);
+  }
+  .pill:hover {
+    background: rgb(var(--ink-rgb) / 0.1);
+    color: var(--ink);
+  }
+  .pill:active {
+    scale: 0.96;
+  }
+  .pill[data-on="true"],
+  .pill[data-state="active"] {
+    background: var(--ink);
+    color: #fff;
+  }
+  .pill[data-size="sm"] {
+    height: 28px;
+    padding: 0 11px;
+    font-size: 12.5px;
+    cursor: default;
+  }
+  .pill[data-size="sm"]:active {
+    scale: 1;
+  }
+
+  /* An outline chip, for values that are read and never pressed. */
+  .ring-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--hairline);
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  /* A round icon button: a wash disc grows in under the icon on hover. */
+  .round {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: color 0.16s;
+  }
+  .round::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgb(var(--ink-rgb) / 0.08);
+    opacity: 0;
+    scale: 0.86;
+    transition:
+      opacity 0.15s,
+      scale 0.26s var(--pop);
+  }
+  .round:hover {
+    color: var(--ink);
+  }
+  .round:hover::before,
+  .round:focus-visible::before {
+    opacity: 1;
+    scale: 1;
+  }
+  .round > svg {
+    position: relative;
+    transition: scale 0.26s var(--pop);
+  }
+  .round:active > svg {
+    scale: 0.9;
+    transition-duration: 90ms;
+  }
+
+  /* A product's photo sits on a wash tile; multiply drops the white studio background into the tile. */
+  .tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background: var(--wash);
+    transition:
+      background 0.2s,
+      scale 0.22s var(--spring);
+  }
+  .tile img {
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition:
+      opacity 0.35s var(--ease-out),
+      scale 0.5s var(--ease-out);
+  }
+  .tile img[data-loaded="true"] {
+    opacity: 1;
+  }
+  .product:hover .tile {
+    background: rgb(var(--ink-rgb) / 0.08);
+  }
+  .product:hover .tile img {
+    scale: 1.035;
+  }
+  .product:active .tile {
+    scale: 0.985;
+  }
+
+  /* The bar over the results: fixed and clear, so the page scrolls under it without the bar ever moving. Only its
+     controls take a surface; once the page has scrolled, they frost over what passes beneath. */
+  .bar {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .bar .find,
+  .bar .find ~ .round {
+    pointer-events: auto;
+  }
+  .bar .find ~ .round {
+    transition:
+      color 0.16s,
+      background 0.16s,
+      box-shadow 0.24s var(--ease-soft);
+  }
+  .bar[data-scrolled="true"] .find,
+  .bar[data-scrolled="true"] .find ~ .round {
+    background: rgb(255 255 255 / 0.74);
+    backdrop-filter: blur(8px) saturate(160%);
+    box-shadow:
+      0 0 0 1px rgb(var(--ink-rgb) / 0.06),
+      0 2px 10px rgb(var(--ink-rgb) / 0.06);
+  }
+  .bar[data-scrolled="true"] .find:focus-within {
+    background: rgb(255 255 255 / 0.9);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .tracking-heading {
+    letter-spacing: -0.022em;
+  }
+}
+
+/* Between the start page and the results, the search box glides and everything else cross-fades. */
+::view-transition-group(search) {
+  animation-duration: 0.5s;
+  animation-timing-function: var(--ease-out);
+}
+
+/* The old box's text leaves quickly, so the two texts barely overlap while the box moves. */
+::view-transition-old(search) {
+  animation-duration: 0.16s;
+}
+
+::view-transition-new(search) {
+  animation-duration: 0.3s;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: var(--ease-out);
+}
+
+/* Entrances: the hero and the products rise in; the components stagger them with an inline animation-delay. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.62s var(--ease-out) both;
+  }
+  .product {
+    animation: rise 0.5s var(--ease-out) both;
+  }
+  /* A transition, so the dice turn back the way they came when the pointer leaves, even mid-turn. */
+  .dice > svg {
+    transition:
+      rotate 0.5s var(--pop),
+      scale 0.26s var(--pop);
+  }
+  .dice:hover > svg {
+    rotate: 180deg;
+  }
+  /* A small status dot: green when on, grey otherwise. */
+  .dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--ink-6);
+  }
+  .dot[data-tone="on"] {
+    background: var(--on);
+  }
+}
+
+/* ══ Heat word ═════════════════════════════════════════════ */
+.heat {
+  position: relative;
+  max-width: 100%;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.heat-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

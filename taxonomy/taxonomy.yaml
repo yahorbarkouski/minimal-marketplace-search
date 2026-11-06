@@ -1,0 +1,519 @@
+categories:
+- id: category.wristwatches
+  name: Wristwatches
+  definition: Covers watches worn on the wrist, including mechanical, quartz, digital, smart, dress, dive, and chronograph
+    watches; a separate watch band is a watch accessory, not a watch.
+- id: category.watch_accessories
+  name: Watch accessories
+  definition: Covers replacement or add-on watch bands and other items made specifically to support or display a
+    watch; a complete timekeeping watch belongs in Wristwatches.
+- id: category.headphones_and_earbuds
+  name: Headphones and earbuds
+  definition: Covers personal listening devices worn on or in the ears, whether wired or wireless; speakers that
+    play sound into a room belong in Speakers and audio equipment.
+- id: category.speakers_and_audio_equipment
+  name: Speakers and audio equipment
+  definition: Covers speakers, turntables, CD players, and other equipment for playing or making audio; personal
+    ear-worn listening devices belong in Headphones and earbuds.
+- id: category.cameras_and_imaging_gear
+  name: Cameras and imaging gear
+  definition: Covers cameras, camera drones, and dedicated photography equipment; a bag made to carry a camera belongs
+    in Bags and luggage.
+- id: category.computers
+  name: Computers
+  definition: Covers complete personal computers, including laptops and desktops; a case, component, or peripheral
+    used with a computer belongs in its corresponding computer category.
+- id: category.computer_components_and_makers_equipment
+  name: Computer components and makers’ equipment
+  definition: Covers PC cases and internal-computing or fabrication equipment such as desktop 3D printers; a complete
+    computer belongs in Computers, while a keyboard or monitor belongs in Computer peripherals.
+- id: category.computer_peripherals
+  name: Computer peripherals
+  definition: Covers keyboards, mice, monitors, webcams, and computer stands or mounts; a computer itself belongs
+    in Computers, while general-purpose desk organizers belong in Desk accessories.
+- id: category.phones_and_mobile_devices
+  name: Phones and mobile devices
+  definition: Covers smartphones, e-readers, smart glasses, smart rings, and other personal mobile computing devices;
+    a protective case, charger, or wallet made for a phone belongs in Mobile-device accessories.
+- id: category.mobile_device_accessories
+  name: Mobile-device accessories
+  definition: Covers phone cases, phone wallets, mobile chargers, and accessories made to attach to or support a
+    phone; a complete phone or other mobile computing device belongs in Phones and mobile devices.
+- id: category.power_and_charging
+  name: Power and charging
+  definition: Covers general-purpose chargers, power banks, and charging stations for electronic devices; an accessory
+    whose main purpose is protecting or carrying a phone belongs in Mobile-device accessories.
+- id: category.bags_and_luggage
+  name: Bags and luggage
+  definition: Covers bags, backpacks, pouches, briefcases, and suitcases used to carry belongings; a wallet or card
+    holder designed to carry money or cards belongs in Wallets and small carry goods.
+- id: category.wallets_and_small_carry_goods
+  name: Wallets and small carry goods
+  definition: Covers wallets, card holders, money clips, and passport covers made to carry small personal essentials;
+    a bag or pouch with broader carrying capacity belongs in Bags and luggage.
+- id: category.everyday_carry_tools
+  name: Everyday carry tools
+  definition: Covers pocket knives, multitools, flashlights, key organizers, and other compact practical tools;
+    a product whose primary job is storing belongings belongs in Bags and luggage or Wallets and small carry goods.
+- id: category.books
+  name: Books
+  definition: Covers bound or printed books, including design, photography, and other illustrated books; blank notebooks,
+    calendars, and loose prints belong in Writing and paper goods.
+- id: category.writing_and_paper_goods
+  name: Writing and paper goods
+  definition: Covers pens, notebooks, calendars, and other products primarily used for writing or working with paper;
+    a bound publication intended to be read belongs in Books.
+- id: category.desk_accessories
+  name: Desk accessories
+  definition: Covers desk mats, trays, shelves, and stands whose main role is organizing or supporting a work surface;
+    electronic computer peripherals belong in Computer peripherals.
+- id: category.lighting
+  name: Lighting
+  definition: Covers portable, desk, table, floor, and other lamps or task lights; a clock with a light is categorized
+    as a clock when timekeeping is its primary purpose.
+- id: category.clocks
+  name: Clocks
+  definition: Covers standalone clocks and alarm clocks, whether analog or digital; a wearable timepiece belongs
+    in Wristwatches.
+- id: category.furniture
+  name: Furniture
+  definition: Covers chairs, sofas, desks, and other full-sized furnishings for sitting or supporting activities;
+    a lamp or small tabletop organizer belongs in Lighting or Desk accessories.
+- id: category.home_decor
+  name: Home decor
+  definition: Covers decorative objects and wall or shelf art, such as vases, mirrors, and prints; a functional
+    lamp or clock belongs in Lighting or Clocks.
+- id: category.coffee_equipment
+  name: Coffee equipment
+  definition: Covers coffee makers, espresso machines, grinders, presses, and tools primarily for preparing coffee;
+    general-purpose kettles, mugs, and cookware belong in Kitchenware and kitchen appliances.
+- id: category.kitchenware_and_kitchen_appliances
+  name: Kitchenware and kitchen appliances
+  definition: Covers cookware, food-preparation tools, beverageware, and kitchen appliances not primarily made for
+    coffee; coffee-specific brewing or grinding equipment belongs in Coffee equipment.
+- id: category.home_appliances
+  name: Home appliances
+  definition: Covers appliances for cleaning, air treatment, and other household tasks outside food preparation;
+    a product primarily made to cook or prepare food belongs in Kitchenware and kitchen appliances.
+- id: category.personal_care_and_grooming
+  name: Personal care and grooming
+  definition: Covers products for personal grooming, hygiene, and body care, including razors, toothbrushes, and
+    hair tools; a product primarily used for exercise or health measurement belongs in Fitness and health.
+- id: category.fragrance_and_candles
+  name: Fragrance and candles
+  definition: Covers personal fragrances and scented candles; an unscented light or decorative object belongs in
+    Lighting or Home decor.
+- id: category.apparel_and_footwear
+  name: Apparel and footwear
+  definition: Covers clothing and shoes, including sneakers and clogs; sunglasses and other eyewear belong in Eyewear.
+- id: category.eyewear
+  name: Eyewear
+  definition: Covers sunglasses and other products worn over the eyes; a wearable electronic display that functions
+    as a computing device belongs in Phones and mobile devices.
+- id: category.gaming_devices
+  name: Gaming devices
+  definition: Covers game consoles and controllers made primarily for playing video games; a general-purpose computer
+    belongs in Computers.
+- id: category.fitness_and_health
+  name: Fitness and health
+  definition: Covers exercise equipment, massage devices, and personal health-measuring products; a grooming or
+    hygiene tool belongs in Personal care and grooming.
+- id: category.vehicles
+  name: Vehicles
+  definition: Covers complete road vehicles such as cars and electric mopeds; a model or building kit depicting
+    a vehicle belongs in Toys and model kits.
+- id: category.toys_and_model_kits
+  name: Toys and model kits
+  definition: Covers building toys, model vehicles, and other play or hobby kits; a complete rideable or road-going
+    vehicle belongs in Vehicles.
+facet_families:
+- id: materials
+  name: Materials
+  values:
+  - id: materials.stainless_steel
+    name: Stainless steel
+    definition: Covers products that specify stainless steel as a main material; other steels without stainless
+      properties belong in Other steel.
+  - id: materials.aluminum
+    name: Aluminum
+    definition: Covers aluminum or aluminium and its alloys when named as a material; stainless or other steel belongs
+      in its respective steel value.
+  - id: materials.other_steel
+    name: Other steel
+    definition: Covers steel identified as a main material without a stainless designation; stainless steel belongs
+      in Stainless steel.
+  - id: materials.brass
+    name: Brass
+    definition: Covers products specifying brass as a main material or prominent finish; gold-colored coating alone
+      does not qualify.
+  - id: materials.titanium
+    name: Titanium
+    definition: Covers products specifying titanium or a titanium alloy as a main material; aluminum alloy belongs
+      in Aluminum.
+  - id: materials.leather
+    name: Leather
+    definition: Covers animal leather, including full-grain, suede, and vegetable-tanned leather; synthetic leather
+      belongs in Vegan leather.
+  - id: materials.vegan_leather
+    name: Vegan leather
+    definition: Covers synthetic or plant-based leather substitutes identified as such; animal hide, including suede,
+      belongs in Leather.
+  - id: materials.wood
+    name: Wood
+    definition: Covers solid wood and named wood species used as a main material; paper made from wood pulp belongs
+      in Paper and cardboard.
+  - id: materials.paper_and_cardboard
+    name: Paper and cardboard
+    definition: Covers paper, board, and cardboard used as structural or covering material; solid wood belongs in
+      Wood.
+  - id: materials.glass
+    name: Glass
+    definition: Covers standard, tempered, and mineral glass used as a main material; sapphire watch crystal belongs
+      in Sapphire crystal.
+  - id: materials.sapphire_crystal
+    name: Sapphire crystal
+    definition: Covers products that specify sapphire crystal, typically as a watch face; mineral or ordinary glass
+      belongs in Glass.
+  - id: materials.plastic
+    name: Plastic
+    definition: Covers plastic resins such as ABS, polycarbonate, TPU, and polypropylene; silicone and rubber belong
+      in Silicone and rubber.
+  - id: materials.silicone_and_rubber
+    name: Silicone and rubber
+    definition: Covers silicone, rubber, and gum rubber used as a main material; rigid plastic resins belong in
+      Plastic.
+  - id: materials.nylon
+    name: Nylon
+    definition: Covers products that specify nylon as a main material, including recycled nylon; polyester textiles
+      belong in Polyester.
+  - id: materials.polyester
+    name: Polyester
+    definition: Covers polyester and recycled polyester used as a main material; nylon textiles belong in Nylon.
+  - id: materials.ceramic
+    name: Ceramic
+    definition: Covers products made primarily from ceramic, including ceramic mugs; glass products belong in Glass.
+  - id: materials.acrylic
+    name: Acrylic
+    definition: Covers products specifying acrylic as a material, including acrylic sheet; other common plastic
+      resins belong in Plastic.
+  - id: materials.foam
+    name: Foam
+    definition: Covers products with foam as a substantial functional or structural material; a thin fabric covering
+      over foam does not make the product primarily Fabric or mesh.
+  - id: materials.fabric_and_mesh
+    name: Fabric and mesh
+    definition: Covers woven, knitted, felted, or mesh textiles when no more specific fiber value applies; named
+      nylon or polyester belongs in that fiber value.
+  - id: materials.recycled_materials
+    name: Recycled materials
+    definition: Covers products explicitly made with recycled material as a notable component; recycled nylon or
+      polyester can also be matched by its named fiber value.
+- id: colors_and_finishes
+  name: Colors and finishes
+  values:
+  - id: colors_and_finishes.black
+    name: Black
+    definition: Covers predominantly black products or components; dark gray and charcoal belong in Gray.
+  - id: colors_and_finishes.white
+    name: White
+    definition: Covers predominantly pure or near-pure white products; cream and ivory belong in Cream and beige.
+  - id: colors_and_finishes.gray
+    name: Gray
+    definition: Covers gray, charcoal, and graphite shades; metallic silver belongs in Silver.
+  - id: colors_and_finishes.silver
+    name: Silver
+    definition: Covers silver-colored and chrome finishes; nonmetallic gray belongs in Gray.
+  - id: colors_and_finishes.brown
+    name: Brown
+    definition: Covers brown, tan, and cognac shades; pale cream or beige belongs in Cream and beige.
+  - id: colors_and_finishes.cream_and_beige
+    name: Cream and beige
+    definition: Covers cream, ivory, and beige shades; stronger tan or brown belongs in Brown.
+  - id: colors_and_finishes.gold
+    name: Gold
+    definition: Covers gold and rose-gold colors or finishes; brass-colored products belong here only when described
+      as gold-toned rather than brass.
+  - id: colors_and_finishes.brass
+    name: Brass
+    definition: Covers brass-colored finishes; gold or rose-gold finishes belong in Gold.
+  - id: colors_and_finishes.copper_and_bronze
+    name: Copper and bronze
+    definition: Covers copper and bronze colors or finishes; yellow-gold or brass finishes belong in Gold or Brass.
+  - id: colors_and_finishes.red
+    name: Red
+    definition: Covers red and burgundy shades; orange-red shades belong in Orange.
+  - id: colors_and_finishes.orange
+    name: Orange
+    definition: Covers orange and red-orange shades; distinctly red shades belong in Red.
+  - id: colors_and_finishes.yellow
+    name: Yellow
+    definition: Covers yellow shades; gold metallic finishes belong in Gold.
+  - id: colors_and_finishes.blue
+    name: Blue
+    definition: Covers blue shades, including navy and teal-blue; green-dominant teal belongs in Green.
+  - id: colors_and_finishes.green
+    name: Green
+    definition: Covers green shades, including olive and sage; blue-dominant teal belongs in Blue.
+  - id: colors_and_finishes.pink_and_purple
+    name: Pink and purple
+    definition: Covers pink, magenta, and purple shades; red-dominant burgundy belongs in Red.
+  - id: colors_and_finishes.clear_and_transparent
+    name: Clear and transparent
+    definition: Covers visibly clear or translucent materials and finishes; opaque white belongs in White.
+  - id: colors_and_finishes.multicolor
+    name: Multicolor
+    definition: Covers products with several visibly distinct colors and no single dominant color; products with
+      one dominant color belong in that color value.
+  - id: colors_and_finishes.natural_wood_tones
+    name: Natural wood tones
+    definition: Covers visible natural wood colors such as walnut and light wood; painted brown finishes belong
+      in Brown.
+- id: styles_and_aesthetics
+  name: Styles and aesthetics
+  values:
+  - id: styles_and_aesthetics.minimalist
+    name: Minimalist
+    definition: Covers restrained designs with few visual elements and little ornament; utilitarian designs emphasize
+      practical construction rather than visual reduction.
+  - id: styles_and_aesthetics.contemporary
+    name: Contemporary
+    definition: Covers designs with a current, broadly modern look; Modernist covers work clearly rooted in a named
+      modernist design tradition.
+  - id: styles_and_aesthetics.industrial
+    name: Industrial
+    definition: Covers designs that foreground utilitarian materials, exposed construction, or workshop references;
+      Modernist is the better fit when formal design principles dominate.
+  - id: styles_and_aesthetics.modernist_and_bauhaus
+    name: Modernist and Bauhaus
+    definition: Covers designs rooted in modernism, Bauhaus, or related early modern design movements; contemporary
+      minimal design without that historical influence belongs in Minimalist or Contemporary.
+  - id: styles_and_aesthetics.scandinavian
+    name: Scandinavian
+    definition: Covers Nordic-inspired designs combining simplicity with practical forms and often warm natural
+      materials; Mid-century modern is for designs specifically reflecting that period.
+  - id: styles_and_aesthetics.mid_century_modern
+    name: Mid-century modern
+    definition: Covers designs visibly inspired by mid-20th-century furniture and product forms; a general Nordic
+      look without period cues belongs in Scandinavian.
+  - id: styles_and_aesthetics.utilitarian
+    name: Utilitarian
+    definition: Covers designs whose visual character foregrounds straightforward usefulness and durable construction;
+      Industrial additionally signals workshop-like materials or exposed structure.
+  - id: styles_and_aesthetics.tech_minimalism
+    name: Tech minimalism
+    definition: Covers streamlined technology products with restrained visual detail; Transparent tech requires
+      visibly clear or translucent construction.
+  - id: styles_and_aesthetics.retro_and_vintage_inspired
+    name: Retro and vintage-inspired
+    definition: Covers products that deliberately reference older eras or retro technology; Mid-century modern is
+      for the specific design language of mid-century modernism.
+  - id: styles_and_aesthetics.quiet_luxury
+    name: Quiet luxury
+    definition: Covers understated, premium-looking designs that signal quality without conspicuous ornament; general
+      polish without a luxury impression belongs in Contemporary.
+  - id: styles_and_aesthetics.organic_modern
+    name: Organic modern
+    definition: Covers modern designs using soft forms, natural textures, or nature-inspired shapes; Sculptural
+      is for forms that read primarily as expressive three-dimensional objects.
+  - id: styles_and_aesthetics.sculptural
+    name: Sculptural
+    definition: Covers products whose shape is a prominent artistic or sculptural feature; Organic modern requires
+      a softer, nature-inspired character.
+  - id: styles_and_aesthetics.editorial_and_graphic
+    name: Editorial and graphic
+    definition: Covers products led by typography, layout, or graphic composition, especially printed matter; a
+      product with no prominent graphic treatment belongs in another style value.
+  - id: styles_and_aesthetics.japanese_minimalism
+    name: Japanese minimalism
+    definition: Covers pared-back designs visibly influenced by Japanese forms or craft; general visual simplicity
+      without that influence belongs in Minimalist.
+  - id: styles_and_aesthetics.functionalist
+    name: Functionalist
+    definition: Covers designs whose form is explicitly organized around function and clarity; Utilitarian describes
+      a practical appearance without necessarily expressing a design philosophy.
+  - id: styles_and_aesthetics.streetwear_and_sporty
+    name: Streetwear and sporty
+    definition: Covers designs drawing on street fashion, sneakers, or athletic gear; Technical outdoor is for equipment-like
+      designs aimed at outdoor use.
+  - id: styles_and_aesthetics.classic_and_timeless
+    name: Classic and timeless
+    definition: Covers familiar, enduring forms intended to outlast short-lived trends; Retro and vintage-inspired
+      requires a deliberate reference to a past era.
+  - id: styles_and_aesthetics.technical_outdoor
+    name: Technical outdoor
+    definition: Covers designs that look purpose-built for outdoor activity, with technical materials or equipment
+      cues; sporty fashion without outdoor utility belongs in Streetwear and sporty.
+  - id: styles_and_aesthetics.playful_and_quirky
+    name: Playful and quirky
+    definition: Covers designs with deliberately whimsical, unusual, or humorous visual character; boldness alone
+      does not make a product playful.
+  - id: styles_and_aesthetics.futuristic_and_transparent_tech
+    name: Futuristic and transparent tech
+    definition: Covers technology designs with visibly forward-looking forms or transparent construction; understated
+      streamlined technology belongs in Tech minimalism.
+- id: use_and_setting
+  name: Use and setting
+  values:
+  - id: use_and_setting.home_office_and_desk
+    name: Home office and desk
+    definition: Covers products intended for a home work desk or home-office setup; products explicitly intended
+      for shared professional workplaces belong in Office and shared workspace.
+  - id: use_and_setting.everyday_carry_and_commute
+    name: Everyday carry and commute
+    definition: Covers products carried or used routinely while moving through the day or commuting; trip-specific
+      luggage and travel gear belong in Travel.
+  - id: use_and_setting.travel
+    name: Travel
+    definition: Covers products intended for trips, airports, or staying away from home; routine daily commuting
+      belongs in Everyday carry and commute.
+  - id: use_and_setting.bedside_and_bedroom
+    name: Bedside and bedroom
+    definition: Covers products intended for a bedside table or bedroom use; products primarily arranged for a living
+      area belong in Living room.
+  - id: use_and_setting.living_room
+    name: Living room
+    definition: Covers products intended for living rooms, coffee tables, or living-room shelves; bedroom-focused
+      products belong in Bedside and bedroom.
+  - id: use_and_setting.kitchen
+    name: Kitchen
+    definition: Covers products used on a kitchen counter or for general kitchen tasks; coffee-specific preparation
+      belongs in Home coffee station.
+  - id: use_and_setting.home_coffee_station
+    name: Home coffee station
+    definition: Covers products intended for a home coffee bar or coffee-preparation setup; general food preparation
+      and kitchen use belong in Kitchen.
+  - id: use_and_setting.office_and_shared_workspace
+    name: Office and shared workspace
+    definition: Covers products intended for an office, shared workplace, or professional work desk; a setup explicitly
+      for working at home belongs in Home office and desk.
+  - id: use_and_setting.creative_and_design_studio
+    name: Creative and design studio
+    definition: Covers products intended for creative work, design studios, or hands-on making; ordinary administrative
+      desk use belongs in Home office and desk or Office and shared workspace.
+  - id: use_and_setting.reading_and_library
+    name: Reading and library
+    definition: Covers products intended for reading nooks, libraries, or bookshelf display; general living-room
+      display belongs in Living room.
+  - id: use_and_setting.everyday_wear
+    name: Everyday wear
+    definition: Covers products intended to be worn routinely in daily life; products specifically intended for
+      formal or business dress belong in Business and formal occasions.
+  - id: use_and_setting.business_and_formal_occasions
+    name: Business and formal occasions
+    definition: Covers products intended for business attire or formal events; casual daily clothing and accessories
+      belong in Everyday wear.
+  - id: use_and_setting.bathroom_and_vanity
+    name: Bathroom and vanity
+    definition: Covers products used at a bathroom vanity or for bathroom routines; bedroom dressing-table use belongs
+      in Bedside and bedroom.
+  - id: use_and_setting.home_fitness
+    name: Home fitness
+    definition: Covers products intended for exercise or fitness at home; personal care products used for grooming
+      belong in Bathroom and vanity.
+  - id: use_and_setting.photography
+    name: Photography
+    definition: Covers products intended for taking, supporting, or viewing photographs; a general-purpose screen
+      or computer does not qualify solely because it can display images.
+  - id: use_and_setting.gaming_and_media_room
+    name: Gaming and media room
+    definition: Covers products intended for video gaming or a home media setup; equipment primarily for making
+      music belongs in Creative and design studio.
+  - id: use_and_setting.weekend_outings
+    name: Weekend outings
+    definition: Covers products intended for casual outings and short local activities; products specifically designed
+      for multi-day trips belong in Travel.
+  - id: use_and_setting.work_and_focused_tasks
+    name: Work and focused tasks
+    definition: Covers products promoted for focused work or concentrated tasks across settings; ordinary home or
+      office furnishings without that task emphasis belong in their respective setting values.
+  - id: use_and_setting.home_workshop
+    name: Home workshop
+    definition: Covers products intended for repairs, tool use, or hands-on work at home; desk-based creative work
+      belongs in Creative and design studio.
+  - id: use_and_setting.living_and_entertaining
+    name: Living and entertaining
+    definition: Covers products intended for hosting, shared household use, or dining-table settings; products primarily
+      used for cooking belong in Kitchen.
+- id: features
+  name: Features
+  values:
+  - id: features.wireless
+    name: Wireless
+    definition: Covers products that perform their main function without a wired connection to another device; a
+      battery-powered product that still requires a cable for its main connection is not wireless.
+  - id: features.bluetooth
+    name: Bluetooth
+    definition: Covers products that explicitly use Bluetooth for wireless connection; other wireless protocols
+      alone do not qualify.
+  - id: features.usb_c
+    name: USB-C
+    definition: Covers products with a USB-C port or included USB-C connection used for charging or data; other
+      USB connector types alone do not qualify.
+  - id: features.wireless_charging
+    name: Wireless charging
+    definition: Covers products that charge a device without a direct charging cable, typically through an inductive
+      charging surface; a magnetic holder without charging does not qualify.
+  - id: features.magnetic_attachment
+    name: Magnetic attachment
+    definition: Covers products that use magnets to attach, align, or hold another object; a magnetic component
+      used only inside the product does not qualify.
+  - id: features.portable
+    name: Portable
+    definition: Covers products designed to be readily carried and used in more than one fixed location; a small
+      product intended to remain installed in one place is not portable.
+  - id: features.rechargeable
+    name: Rechargeable
+    definition: Covers products with a battery that can be replenished by charging; products powered only by disposable
+      batteries do not qualify.
+  - id: features.battery_powered
+    name: Battery-powered
+    definition: Covers products that can operate from an onboard or replaceable battery; a product that must be
+      plugged into mains power to operate does not qualify.
+  - id: features.smart_or_connected
+    name: Smart or connected
+    definition: Covers products with electronic functions that connect to an app, network, or other smart devices;
+      a digital display alone does not make a product smart.
+  - id: features.mechanical
+    name: Mechanical
+    definition: Covers products whose key action is driven by a mechanical mechanism, such as a mechanical keyboard
+      or mechanical watch movement; electronic operation alone does not qualify.
+  - id: features.automatic_winding
+    name: Automatic winding
+    definition: Covers mechanical watches that wind themselves through the wearer’s motion; hand-wound watches and
+      battery-powered watches do not qualify.
+  - id: features.quartz_timekeeping
+    name: Quartz timekeeping
+    definition: Covers watches or clocks using a quartz-regulated electronic timekeeping movement; mechanical and
+      purely digital timekeeping without a specified quartz movement do not qualify.
+  - id: features.digital_display
+    name: Digital display
+    definition: Covers products that present information or time through electronically rendered numerals or graphics;
+      analog hands or physical scales alone do not qualify.
+  - id: features.analog_display
+    name: Analog display
+    definition: Covers products that show time or measurements with hands, a dial, or a physical scale; a screen
+      showing numerals or graphics belongs in Digital display.
+  - id: features.adjustable
+    name: Adjustable
+    definition: Covers products with a component or setting the user can reposition or change to suit different
+      needs; a fixed product offered only in different sizes is not adjustable.
+  - id: features.ergonomic
+    name: Ergonomic
+    definition: Covers products expressly designed to improve comfort, posture, or ease of handling; a comfortable-looking
+      shape without an ergonomic function does not qualify.
+  - id: features.compact
+    name: Compact
+    definition: Covers products designed to occupy notably little space or pack into a small form; portability alone
+      does not make a full-sized product compact.
+  - id: features.water_resistant
+    name: Water-resistant
+    definition: Covers products explicitly rated or described as resisting water exposure; ordinary moisture tolerance
+      without a stated water-resistance claim does not qualify.
+  - id: features.foldable
+    name: Foldable
+    definition: Covers products designed to fold into a smaller form for storage or transport; a product that only
+      disassembles into separate parts is not foldable.
+  - id: features.multi_device_charging
+    name: Multi-device charging
+    definition: Covers charging products designed to charge more than one device at the same time; a charger with
+      multiple ports that can power only one device at a time does not qualify.

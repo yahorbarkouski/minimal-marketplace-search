@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+/data/
+node_modules/
+.next/
+out/
+.vercel
+*.tsbuildinfo
+.env*.local
+# Build output, which can hold a licensed font
+/public/
+/site/
+# Local tooling
+.claude/
+/web/AGENTS.md
+/web/CLAUDE.md
