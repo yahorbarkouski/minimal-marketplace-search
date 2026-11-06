@@ -4,7 +4,7 @@ Natural-language search over the 1,301 products of [curated.supply](https://www.
 
 Jev, the decision model from TypeSafe, answers the yes-or-no questions, reading each candidate's text and photo. Gemini writes each search's interpretation, reads any price limit, and provides the embeddings. The owner of curated.supply has allowed the full download.
 
-**State on 2026-11-06:** all 1,301 products are indexed and the search runs on the real models, deployed at https://curated-supply-search.vercel.app behind a password. Its quality has been read by eye on the 38 searches behind the dice button, and one blind judge graded 240 search and product pairs from 10 of them; there is no larger benchmark.
+**State on 2026-11-06:** all 1,301 products are indexed and the search runs on the real models, deployed at https://curated-supply-search.vercel.app behind a password. See [Benchmark](#benchmark) for how well it works.
 
 ## Run it
 
@@ -45,7 +45,7 @@ cd web && bun install && bun run dev
 
 Open http://localhost:3210, or http://localhost:3210/?q=calm+bedroom to run a search from the address. Every search makes several paid model calls: $0.0049 on average over the 38 dice searches, nearly all of it Jev's gate. A page that gates all 100 products comes to about $0.006. Reaching the end of a long page judges one more batch, which adds about $0.0025. Run 3 at a time, a page took 1.8 s at the median and 3.2 s at most, the slowest being searches with a price limit. On the 28 searches with an early product, it appeared at 0.8 s at the median.
 
-To judge quality, run the searches behind the page's dice button (`web/components/curated/examples.ts`) and read the results.
+To judge quality, see [Benchmark](#benchmark).
 
 ## How a search works
 
@@ -75,12 +75,49 @@ Jev gate, reading each product's card and photo: the probability p that it is a 
 
 Jev alone decides the page. An earlier version sent the products Jev was unsure about to Gemini Flash-Lite for a grade, and removing it cut the average search from $0.0081 to $0.0049 and the median page from 2.8 s to 1.8 s. The question in `src/curated/search/gate.py` is stricter to make up for it. Against one blind judge's grades on 10 searches, 78% of the graded products on the new pages were good, where the review's pages scored 67%, and they found fewer good products in all: 118 against 145. The question was written after seeing those 10 searches, so these numbers flatter it. The counts in `src/curated/settings.py` are set to keep a search under a cent.
 
+## Benchmark
+
+`benchmark/searches.jsonl` holds 40 searches, written after the search's question and thresholds were fixed, and used to tune neither. `benchmark/grades.jsonl` holds what two blind judges said of 644 pairs of search and product: each page's first ten, up to five more from the page, and the five products just under its line. The judges read the product's text with no score, rank or sign of whether it was shown, and graded each pair from 0 (wrong) to 3 (exactly right). A product counts as good when its mean grade is at least 2.
+
+| Kind of search | Searches | Good in the first 10 | Order (nDCG@10) | Good products found | Median products shown |
+| --- | --- | --- | --- | --- | --- |
+| All | 40 | 78% | 0.88 | 90% | 15.5 |
+| Brand or name | 6 | 100% | 0.96 | 99% | 7.5 |
+| Stated limit | 6 | 94% | 0.91 | 86% | 11 |
+| Attributes | 7 | 88% | 0.96 | 98% | 5 |
+| Appearance | 5 | 80% | 0.94 | 89% | 33 |
+| Across categories | 6 | 67% | 0.80 | 81% | 37 |
+| Mood | 5 | 66% | 0.80 | 85% | 42 |
+| Person, film or place | 5 | 40% | 0.71 | 92% | 34 |
+
+A search cost $0.0049 on average and $0.0056 at most. Run one at a time, a full page took 1.66 s at the median and 2.93 s at most, and on the 30 searches with an early product, the first appeared at 0.72 s.
+
+Read these numbers with their limits in mind:
+
+- **Judges:** both were the same language model given differently worded instructions, not people. They gave the same grade on 83% of pairs and agreed on good or not on 93% (kappa 0.85), which likely overstates how far people would agree.
+- **Text only:** the judges read product text and saw no photos, though the search itself reads them. Searches about looks are the least certain.
+- **Found means found among the graded products.** Products the gate rated far under the line, and those the rankings never reached, were not graded, so the true share found is lower than the table says.
+- **Small groups:** each kind has 5 to 7 searches, so one search moves its row by several points. `things for a new dad` shows a single product and it was graded weak; `Steve Jobs's living room` has 1 good product in its first 10.
+
+To run it, which costs about $0.20, and then score it, which is free:
+
+```bash
+uv run curated benchmark run --name my-change
+```
+
+```bash
+uv run curated benchmark score --name my-change
+```
+
+`curated benchmark pool --name my-change` lists the pairs a change has brought up that have no grade yet, and the score shows how much of each first ten was graded. Compare runs with care: tuning against these searches would make them stop measuring anything, so add new searches for each round of tuning.
+
 ## Known limits
+
 
 - **Broad searches keep long tails.** On a search many products could answer, the gate cuts little: `things a design student would save up for` shows 94 of the 100 products it read, and `retro objects that still work` ends on Nike sneakers. The sort keeps the weak ones at the end.
 - **The strict question loses some good products.** `desk lamp under $150` shows 3 products, and the Govee table lamp at $135 scores 0.30. `calm bedroom` loses the sleep mask at 0.33, and `dark academia study` loses the Lamy 2000 at 0.30.
 - **An early product stays even if the final gate disagrees.** This happened to 5 of the 287 early products on the 38 dice searches. Four were in `round speaker that looks like sculpture`, where the interpretation made the final gate more literal, so the Beosound A9 sits near the top with a score of 0.16.
-- **Searches that name a person, film or aesthetic can return thin pages**, because they rest on the interpretation alone: only 78 of the 1,301 readings named a reference. `cyberpunk desk` returns 3 products and `Wes Anderson hotel lobby` 4, all but one at low scores.
+- **Searches that name a person, film or aesthetic are the weakest kind**, with 40% good in the first ten on the benchmark, because they rest on the interpretation alone: only 78 of the 1,301 readings named a reference. `cyberpunk desk` returns 3 products and `Wes Anderson hotel lobby` 4, all but one at low scores.
 - **A narrow limit returns what exists.** `espresso machine under $500` returns one espresso machine and four stovetop makers, because nearly every espresso machine here costs more.
 - **The interpretation can lapse.** It has a 2.5 s timeout. It missed it on 1 of 20 searches in an earlier run, and that page was thin. It did not miss it on the 38 dice searches.
 
