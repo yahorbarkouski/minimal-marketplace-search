@@ -11,57 +11,13 @@ from typesafe_sdk import TypeSafeError
 
 from curated.catalog import about_text, article_titles, json_ld, parse_product, react_payload, site_dataset, spec_rows
 from curated.cli import _settings
-from curated.domain import Product, Spec
+from curated.domain import Spec
 from curated.scrape import page_path, photo_path, sitemap_urls
 from curated.search.searcher import Searcher, SearchIndex
 from curated.server import create_app
 from curated.settings import Settings
-from tests.stubbed_index import build_stubbed_root, stubbed_demo
+from tests.stubbed_index import stubbed_demo
 from tests.stubs import StubJev, StubModels
-
-
-def product(
-    product_id: str, name: str, category: str, price: float | None, about: str, *, lists: tuple[str, ...] = ()
-) -> Product:
-    return Product(
-        product_id=product_id,
-        url=f"https://www.curated.supply/products/{product_id}",
-        name=name,
-        brand="Acme",
-        brand_slug="acme",
-        category=category,
-        category_slug=category.lower(),
-        lists=lists,
-        articles=(),
-        price=price,
-        staff_pick=False,
-        rank=1,
-        added="2026-01-01",
-        about=about,
-        designed_in="Japan",
-        specs=(Spec(name="Weight", value="100 g"),),
-        alternatives=(),
-        photo_url="https://assets.curated.supply/x.webp",
-    )
-
-
-PRODUCTS = (
-    product("black-lamp", "Black desk lamp", "Workspace", 120, "A black desk lamp in steel.", lists=("Black Only",)),
-    product("costly-lamp", "Marble desk lamp", "Workspace", 900, "A desk lamp in marble."),
-    product("no-price-lamp", "Paper desk lamp", "Home", None, "A desk lamp in paper."),
-    product("backpack", "Canvas backpack", "Carry", 200, "A canvas backpack for a laptop."),
-)
-
-
-@pytest.fixture
-def settings(tmp_path: Path) -> Settings:
-    source = Settings(root=tmp_path / "source")
-    source.data_dir.mkdir(parents=True)
-    source.photos_dir.mkdir()
-    with source.products_path.open("w", encoding="utf-8") as out:
-        for item in PRODUCTS:
-            out.write(item.model_dump_json() + "\n")
-    return build_stubbed_root(source, tmp_path / "stubbed")
 
 
 def searcher(settings: Settings) -> Searcher:

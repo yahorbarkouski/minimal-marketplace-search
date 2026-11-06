@@ -63,6 +63,16 @@ class SearchSizes:
     expansion_product_floor: float = 0.5
 
 
+def _optional_float(name: str) -> float | None:
+    value = os.environ.get(name)
+    return float(value) if value else None
+
+
+def _optional_int(name: str) -> int | None:
+    value = os.environ.get(name)
+    return int(value) if value else None
+
+
 @dataclass(frozen=True)
 class Settings:
     """Everything the catalogue, the index and the spend ledger hold lives under `data/`."""
@@ -72,6 +82,10 @@ class Settings:
     """The spend cap the ledger enforces across indexing and every search."""
     spent_before_usd: float = field(default_factory=lambda: float(os.environ.get("CURATED_SPENT_BEFORE_USD", "0")))
     """What had been spent before deploying, which counts against the cap on Vercel."""
+    daily_budget_usd: float | None = field(default_factory=lambda: _optional_float("CURATED_DAILY_BUDGET_USD"))
+    """When set, the cap for searches is this much per UTC day, in place of `budget_usd` and `spent_before_usd`."""
+    searches_per_hour: int | None = field(default_factory=lambda: _optional_int("CURATED_SEARCHES_PER_HOUR"))
+    """When set, how many searches and further batches one visitor may ask for in an hour."""
     models: Models = field(default_factory=Models)
     sizes: SearchSizes = field(default_factory=SearchSizes)
 

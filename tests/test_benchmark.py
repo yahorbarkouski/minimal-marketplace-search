@@ -42,7 +42,10 @@ def test_an_empty_page_loses_recall_and_measures_no_precision() -> None:
 def test_ndcg_is_one_for_the_best_order_and_lower_for_a_worse_one() -> None:
     grades = {"a": 3.0, "b": 2.0, "c": 0.0}
     assert ndcg(("a", "b", "c"), grades) == pytest.approx(1.0)
-    assert ndcg(("c", "b", "a"), grades) < ndcg(("b", "a", "c"), grades) < 1.0
+    worst, middle = ndcg(("c", "b", "a"), grades), ndcg(("b", "a", "c"), grades)
+    assert worst is not None
+    assert middle is not None
+    assert worst < middle < 1.0
     assert ndcg(("a",), {"a": 0.0}) is None
 
 

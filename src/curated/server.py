@@ -6,7 +6,7 @@
   (`curated.debug_view`): each stage on one time axis, how Jev read the search, the counts from the catalogue to the
   page, and every judged product with the rankings that found it; with the id that asks for the further batches and
   whether one may still hold matches;
-- `error`: the search failed.
+- `error`: the search failed, or the visitor or the site has reached a limit.
 `GET /api/search/{search_id}/more` judges the search's next batch, while it may still hold matches.
 `GET /api/products/{product_id}` describes one product; its photo comes from curated.supply's own CDN.
 `GET /api/health` says how many products the server holds, and costs nothing.
@@ -18,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import sys
 from collections import OrderedDict
 from collections.abc import AsyncIterator, Callable, Mapping
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
@@ -26,14 +27,15 @@ from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 
 from curated.debug_view import describe_search
 from curated.domain import Product, ProductId, Reading, SearchTrace
 from curated.indexing.card import price_line
 from curated.indexing.reading import load_readings
-from curated.ledger import SpendLedger
+from curated.ledger import BudgetExceededError, SpendLedger
+from curated.limits import RateLimit, visitor_address, wait_message
 from curated.providers.jev import JevClient
 from curated.providers.openrouter import OpenRouterClient
 from curated.search.searcher import Continuation, Searcher, SearchIndex
@@ -102,14 +104,18 @@ def connect_demo(settings: Settings) -> DemoFactory:
 
     @asynccontextmanager
     async def open_demo() -> AsyncIterator[Demo]:
-        ledger = SpendLedger.open(settings.ledger_path, settings.budget_usd)
+        daily = settings.daily_budget_usd
+        cap = settings.budget_usd if daily is None else daily
+        ledger = SpendLedger.open(settings.ledger_path, cap, daily=daily is not None)
         async with (
             OpenRouterClient.connect(ledger) as openrouter,
             JevClient.connect(ledger, settings.models) as jev,
         ):
             searcher = Searcher(SearchIndex.load(settings), settings=settings, openrouter=openrouter, jev=jev)
             shared = (
-                SharedSpend(ledger, spent_before_usd=settings.spent_before_usd) if os.environ.get(BLOB_TOKEN) else None
+                SharedSpend(ledger, spent_before_usd=settings.spent_before_usd if daily is None else 0.0)
+                if os.environ.get(BLOB_TOKEN)
+                else None
             )
             yield Demo(searcher=searcher, settings=settings, readings=load_readings(settings), shared_spend=shared)
 
@@ -118,11 +124,14 @@ def connect_demo(settings: Settings) -> DemoFactory:
 
 def create_app(open_demo: DemoFactory) -> FastAPI:
     state: dict[str, Demo] = {}
+    limits: dict[str, RateLimit] = {}
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         async with open_demo() as demo:
             state["demo"] = demo
+            if demo.settings.searches_per_hour is not None:
+                limits["visitor"] = RateLimit(demo.settings.searches_per_hour)
             yield
 
     app = FastAPI(title="Curated", lifespan=lifespan)
@@ -130,20 +139,32 @@ def create_app(open_demo: DemoFactory) -> FastAPI:
     def demo() -> Demo:
         return state["demo"]
 
+    def wait_for(request: Request) -> int | None:
+        """Counts a paid request against the visitor; the seconds to wait when they have reached the limit."""
+        limit = limits.get("visitor")
+        return None if limit is None else limit.retry_after(visitor_address(request))
+
     @app.get("/api/health")
     def health() -> dict[str, int]:
         return {"products": len(demo().searcher.index.products)}
 
     @app.get("/api/search")
-    async def search(q: str = Query(min_length=1, max_length=MAX_QUERY_CHARACTERS)) -> StreamingResponse:
+    async def search(
+        request: Request, q: str = Query(min_length=1, max_length=MAX_QUERY_CHARACTERS)
+    ) -> StreamingResponse:
         text = " ".join(q.split())
         if not text:
             raise HTTPException(status_code=422, detail="the search is empty")
-        events = _search_events(demo(), text)
+        # An error event, because a page's event stream can't read a response's status or body.
+        wait = wait_for(request)
+        events = _refused(wait_message(wait)) if wait is not None else _search_events(demo(), text)
         return StreamingResponse(events, media_type="text/event-stream", headers=STREAM_HEADERS)
 
     @app.get("/api/search/{search_id}/more")
-    async def more(search_id: str) -> dict[str, Any]:
+    async def more(request: Request, search_id: str) -> dict[str, Any]:
+        wait = wait_for(request)
+        if wait is not None:
+            raise HTTPException(status_code=429, detail=wait_message(wait), headers={"Retry-After": str(wait)})
         current = demo()
         search = current.ongoing.get(search_id)
         if search is None:
@@ -174,6 +195,10 @@ def create_app(open_demo: DemoFactory) -> FastAPI:
     return app
 
 
+async def _refused(message: str) -> AsyncIterator[str]:
+    yield f"event: error\ndata: {json.dumps({'message': message})}\n\n"
+
+
 async def _search_events(demo: Demo, text: str) -> AsyncIterator[str]:
     """Runs one search and yields its events: the early products, then the result or an error."""
     events: asyncio.Queue[tuple[str, Any] | None] = asyncio.Queue()
@@ -190,8 +215,13 @@ async def _search_events(demo: Demo, text: str) -> AsyncIterator[str]:
             search_id = demo.keep(Ongoing(trace=trace, more=more))
             worth = demo.searcher.worth_judging(more)
             events.put_nowait(("result", present(demo, trace) | {"search_id": search_id, "more": worth}))
-        except Exception as error:  # the page shows the failure instead of hanging
-            events.put_nowait(("error", {"message": f"{type(error).__name__}: {error}"}))
+        except BudgetExceededError:
+            events.put_nowait(
+                ("error", {"message": "The search has reached its spending limit. Please try again later."})
+            )
+        except Exception as error:  # the page shows the failure instead of hanging; the details stay in the log
+            print(f"[search] {text!r} failed: {error!r}", file=sys.stderr)
+            events.put_nowait(("error", {"message": "The search failed. Please try again."}))
         finally:
             # Shielded, so a visitor who closes the page mid-search still has its spend counted.
             await asyncio.shield(demo.share_spend())

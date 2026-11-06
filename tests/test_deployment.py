@@ -1,6 +1,8 @@
 """The password gate, and the spend total that serverless instances share."""
 
 import asyncio
+import json
+import time
 from collections.abc import AsyncIterator
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,7 +13,7 @@ from fastapi.testclient import TestClient
 
 from curated import shared_spend
 from curated.gate import COOKIE, PasswordGate, access_token
-from curated.ledger import SpendLedger
+from curated.ledger import BudgetExceededError, SpendLedger
 from curated.shared_spend import SharedSpend, amount_of
 
 PASSWORD = "open sesame"
@@ -94,7 +96,8 @@ class FakeBlobs:
 
     async def query(self, *, prefix: str) -> AsyncIterator[SimpleNamespace]:
         for name in self.names:
-            yield SimpleNamespace(pathname=name)
+            if name.startswith(prefix):
+                yield SimpleNamespace(pathname=name)
 
 
 def ledger_at(tmp_path: Path, name: str, cap: float = 5.0) -> SpendLedger:
@@ -134,3 +137,35 @@ async def test_sharing_twice_counts_once(tmp_path: Path, monkeypatch: pytest.Mon
     await sharing.refresh()
     assert ledger.total_usd == pytest.approx(0.25)
     assert len(blobs.names) == 1
+
+
+async def test_a_daily_ledger_counts_one_day_and_its_budget_comes_back(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path = tmp_path / "daily.jsonl"
+    yesterday = time.time() - 86_400
+    path.write_text(
+        json.dumps({"at": yesterday, "cost_usd": 9.0}) + "\n" + json.dumps({"at": time.time(), "cost_usd": 0.5}) + "\n"
+    )
+    ledger = SpendLedger.open(path, 1.0, daily=True)
+    assert ledger.total_usd == pytest.approx(0.5)
+    ledger.record(provider="p", model="m", purpose="search", cost_usd=0.5)
+    with pytest.raises(BudgetExceededError, match="today's"):
+        ledger.ensure_room()
+    ledger.day = "2020-01-01"
+    ledger.ensure_room()
+    assert ledger.total_usd == 0
+
+
+async def test_instances_share_only_todays_spend(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    blobs = FakeBlobs(monkeypatch)
+    blobs.names.append("spend/2020-01-01/old-9.000000.txt")
+    ledger = SpendLedger.open(tmp_path / "a.jsonl", 5.0, daily=True)
+    sharing = SharedSpend(ledger, spent_before_usd=0.0)
+    await sharing.refresh()
+    assert ledger.total_usd == 0
+    ledger.record(provider="p", model="m", purpose="search", cost_usd=0.25)
+    await sharing.share()
+    assert any(name.startswith(f"spend/{ledger.day}/") for name in blobs.names)
+    await sharing.refresh()
+    assert ledger.total_usd == pytest.approx(0.25)

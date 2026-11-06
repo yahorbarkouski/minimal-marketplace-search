@@ -142,6 +142,8 @@ vercel deploy --prod --yes
 | `SITE_PASSWORD` | The password the gate asks for; without it the site is open |
 | `CURATED_BUDGET_USD` | The spend cap across every instance |
 | `CURATED_SPENT_BEFORE_USD` | What had been spent before deploying, which counts against the cap |
+| `CURATED_DAILY_BUDGET_USD` | When set, the cap is this much per UTC day, in place of the two above |
+| `CURATED_SEARCHES_PER_HOUR` | When set, how many searches and further batches one visitor may ask for in an hour |
 | `CURATED_LEDGER` | A writable path for the instance's ledger, `/tmp/ledger.jsonl` |
 | `BLOB_READ_WRITE_TOKEN` | Access to the Blob store `curated-supply-spend`, set by Vercel |
 
@@ -181,6 +183,15 @@ Before committing, run `uv run ruff check`, `uv run ruff format --check` and `uv
 | `src/curated/settings.py` | Every model name, size and threshold |
 | `web/components/curated/` | The search page, cards, product dialog and debug panel |
 | `tests/` | The tests, the stand-ins and the stubbed index |
+
+## Running it in public
+
+A public deployment spends your money on every search, so set both limits and leave `SITE_PASSWORD` out:
+
+- **The daily budget is what bounds the bill.** Every search checks the total across all instances first, so past the cap the search stops however many visitors or addresses there are. Searches already running when the cap is reached still finish, so it can run over by a few searches.
+- **The per-visitor limit stops casual abuse only.** It counts in each instance's memory, so several instances allow several times the limit, and someone with many addresses goes around it. On Vercel it reads `x-vercel-forwarded-for`, which Vercel sets itself; elsewhere it reads the connection's address, so behind your own proxy every visitor counts as one.
+
+Past either limit the page shows a short message. Other failures show a generic message, and the details go to the server's log.
 
 ## Licence
 
