@@ -21,7 +21,7 @@ from curated.settings import Settings
 
 ARCHIVE_NAME = "curated-data.tar.gz"
 CHECKSUM_FILE = "data-release.sha256"
-DATA_URL = f"https://github.com/yahorbarkouski/curated-supply/releases/download/data-v1/{ARCHIVE_NAME}"
+DATA_URL = f"https://github.com/yahorbarkouski/minimal-marketplace-search/releases/download/data-v1/{ARCHIVE_NAME}"
 """A fixed tag and not `latest`, so a checkout keeps finding the file its checksum describes."""
 RELEASED_FILES = ("products.jsonl", "readings.jsonl")
 RELEASED_DIRECTORY = "index"

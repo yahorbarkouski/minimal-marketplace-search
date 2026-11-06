@@ -1,4 +1,4 @@
-# Curated Supply search
+# Minimal marketplace search
 
 Natural-language search over the 1,301 products of [curated.supply](https://www.curated.supply/browse). A buyer types what they want in their own words, such as `quiet luxury desk setup`, `espresso machine under $500` or `a Bond villain's desk`, and the site returns the matching products in one list, the strongest first. Each one links to its page on curated.supply.
 
