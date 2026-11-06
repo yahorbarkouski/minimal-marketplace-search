@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 from pathlib import Path
 
@@ -10,6 +11,7 @@ import typer
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 
+from curated.benchmark import load_grades, load_run, pool, report, run_benchmark, run_directory, score_run
 from curated.cache import JsonCache
 from curated.catalog import build_catalog, load_products
 from curated.deployment import create_site
@@ -27,6 +29,8 @@ DEFAULT_JOB_CAP = 3.0
 """Dollars one paid indexing job may spend before it stops itself."""
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
+benchmark = typer.Typer(no_args_is_help=True, help="Measure the search on fixed searches and blind grades.")
+app.add_typer(benchmark, name="benchmark")
 
 
 def _settings() -> Settings:
@@ -133,6 +137,43 @@ def serve(
     built = create_site(settings, connect_demo(settings))
     built.mount("/", StaticFiles(directory=settings.root / "public"))
     uvicorn.run(built, host=host, port=port)
+
+
+@benchmark.command("run")
+def benchmark_run(
+    name: str = typer.Option("latest", help="The saved run to write; a rerun continues it."),
+    limit: int | None = typer.Option(None, help="Run only this many searches, to try it cheaply."),
+) -> None:
+    """Run the benchmark's searches for real, one at a time. It costs about $0.005 a search."""
+    settings = _settings()
+    results = asyncio.run(
+        run_benchmark(settings, searches=settings.root / "benchmark" / "searches.jsonl", name=name, limit=limit)
+    )
+    typer.echo(f"saved to {results}")
+
+
+@benchmark.command("pool")
+def benchmark_pool(name: str = typer.Option("latest", help="The saved run to read.")) -> None:
+    """Print the pairs of search and product that still need a grade, one JSON object per line. It costs nothing."""
+    settings = _settings()
+    runs = load_run(run_directory(settings, name) / "results.jsonl")
+    for search, product_id in pool(runs, load_grades(settings.root / "benchmark" / "grades.jsonl")):
+        typer.echo(json.dumps({"search": search, "product_id": product_id}, ensure_ascii=False))
+
+
+@benchmark.command("score")
+def benchmark_score(
+    name: str = typer.Option("latest", help="The saved run to score."),
+    details: bool = typer.Option(False, help="Print each search's numbers as JSON too."),
+) -> None:
+    """Score a saved run against the blind grades. It costs nothing."""
+    settings = _settings()
+    runs = load_run(run_directory(settings, name) / "results.jsonl")
+    scores = score_run(runs, load_grades(settings.root / "benchmark" / "grades.jsonl"))
+    typer.echo(report(scores))
+    if details:
+        for row in scores["searches"]:
+            typer.echo(json.dumps(row, ensure_ascii=False))
 
 
 if __name__ == "__main__":
