@@ -18,7 +18,15 @@ cp .env.example .env
 uv sync
 ```
 
-Then build the data in this order. Everything lands in `data/`, which is not meant for version control, except the taxonomy, which lands in `taxonomy/`.
+The quickest way to run the search is to download the built catalogue and index, about 25 MB, which needs no scrape and no paid build. The file is checked against `data-release.sha256` before anything is unpacked:
+
+```bash
+uv run curated download
+```
+
+Then skip to the two commands that start the search. The file holds text and photos from curated.supply, which the MIT licence does not cover. Searches still need both keys.
+
+To build everything yourself, for example for a catalogue of your own, build the data in this order. Everything lands in `data/`, which is not meant for version control, except the taxonomy, which lands in `taxonomy/`.
 
 | Step | Command | What it does | Cost |
 | --- | --- | --- | --- |
@@ -29,7 +37,7 @@ Then build the data in this order. Everything lands in `data/`, which is not mea
 | Taxonomy | `uv run curated taxonomy` | GPT-6 Luna writes `taxonomy/taxonomy.yaml`, the categories and facets Jev uses, from what the readings found. | $0.01 |
 | Index | `uv run curated index` | Gemini embeds each product's text, style and photo, Jev tags every product with the taxonomy from its text, and each photo is saved as the JPEG the search shows Jev. | $0.61 |
 
-These are the measured costs of the build on 2026-11-04; Jev reports no price, so its share is computed from input tokens at $0.042 per million. Run the taxonomy after the full read, because it is written from whichever readings exist.
+`curated package` writes what you have built as one file to publish, and records its checksum. These are the measured costs of the build on 2026-11-04; Jev reports no price, so its share is computed from input tokens at $0.042 per million. Run the taxonomy after the full read, because it is written from whichever readings exist.
 
 `read` and `index` save each result as it arrives and stop after five failures in a row. They also stop once the job has spent `--max-cost` (default $3), counting its earlier runs, so pass a higher value if a job stops there. Running a job again retries its failures and continues, so run `read` again if its last line counts fewer than 1,301 readings; `index` refuses to start until every product has one. The spend ledger, `data/ledger.jsonl`, counts every paid call, and `uv run curated spend` prints its total. It refuses new model calls once the total reaches `CURATED_BUDGET_USD` (default $10, which you can set in `.env`); from then on a search shows that error on the page.
 

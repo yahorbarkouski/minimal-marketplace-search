@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from curated.benchmark import load_grades, load_run, pool, report, run_benchmark, run_directory, score_run
 from curated.cache import JsonCache
 from curated.catalog import build_catalog, load_products
+from curated.data_release import DATA_URL, download_data, expected_checksum, package_data
 from curated.deployment import create_site
 from curated.indexing.build import build_index
 from curated.indexing.reading import load_readings, read_products, sample_per_category, write_readings
@@ -111,6 +112,24 @@ def index(
             )
 
     asyncio.run(run())
+
+
+@app.command()
+def download(
+    source: str = typer.Option(DATA_URL, help="Where the data file is: a URL or a local path."),
+    force: bool = typer.Option(False, help="Replace the catalogue and index already in data/."),
+) -> None:
+    """Fetch the built catalogue and index, so the search runs with no scrape and no paid build."""
+    settings = Settings()
+    count = download_data(settings, source=source, checksum=expected_checksum(settings), force=force)
+    typer.echo(f"unpacked {count} files into {settings.data_dir}")
+
+
+@app.command()
+def package(out: str = typer.Option("dist", help="The folder to write the data file to.")) -> None:
+    """Write the built catalogue and index as one file to publish, and record its checksum."""
+    archive, checksum = package_data(Settings(), Path(out))
+    typer.echo(f"{archive}: {archive.stat().st_size / 1_000_000:.1f} MB, sha256 {checksum}")
 
 
 @app.command()
