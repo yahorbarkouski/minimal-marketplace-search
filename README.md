@@ -184,4 +184,4 @@ Before committing, run `uv run ruff check`, `uv run ruff format --check` and `uv
 
 ## Licence
 
-The code is under the [MIT licence](LICENSE). It does not cover the products, text and photos on curated.supply, which belong to their owners, or any font you add at build time. `web/components/heat/heat-map.tsx` is adapted from Bencho's MIT-licensed Heat map; see its header.
+The code is under the [MIT licence](LICENSE). It does not cover the products, text and photos on curated.supply, which belong to their owners, or any font you add at build time. `web/components/heat/heat-map.tsx` is adapted from Bencho's Heat map, under the MIT licence beside it.

@@ -1,6 +1,6 @@
 "use client"
 
-/* From Bencho's "Heat map" (MIT, bencho.dev/licence), adapted: the word and the canvas size are props, and the
+/* From Bencho's "Heat map" (MIT, Copyright (c) 2026 Lorenzo Cabra; see LICENSE here), adapted: the word and the canvas size are props, and the
    face is the site's own. */
 
 import { useEffect, useRef, useState } from "react"

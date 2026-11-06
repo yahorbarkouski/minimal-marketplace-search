@@ -18,3 +18,4 @@ out/
 .claude/
 /web/AGENTS.md
 /web/CLAUDE.md
+.coverage

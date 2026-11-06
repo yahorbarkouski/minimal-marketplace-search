@@ -129,6 +129,24 @@ async def test_a_product_shown_early_stays_when_the_final_gate_fails(settings: S
     assert trace.shown == trace.first_results
 
 
+async def test_a_later_product_with_a_higher_score_stays_below_what_was_shown_early(settings: Settings) -> None:
+    class ChangesItsMind(StubJev):
+        async def ask(self, state, questions, *, purpose, assets=None):
+            if isinstance(state, dict) and "what_the_search_refers_to" in state:
+                state = {**state, "buyer_search": "canvas backpack"}
+            return await super().ask(state, questions, purpose=purpose, assets=assets)
+
+    slow = Searcher(
+        SearchIndex.load(settings), settings=settings, openrouter=StubModels(delay_s=0.05), jev=ChangesItsMind()
+    )
+    trace, _ = await slow.begin("black desk lamp", on_first_results=lambda _: None)
+    assert "black-lamp" in trace.first_results
+    assert "backpack" not in trace.first_results
+    assert trace.shown[0] == "black-lamp"
+    assert trace.shown[-1] == "backpack"
+    assert trace.gate["backpack"] > trace.gate["black-lamp"]
+
+
 async def test_the_early_gate_reads_only_the_best_fused_products(settings: Settings) -> None:
     class Recording(StubJev):
         gated: ClassVar[list[int]] = []
