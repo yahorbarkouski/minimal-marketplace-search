@@ -7,7 +7,7 @@ import json
 import random
 import sys
 from asyncio import sleep
-from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -18,9 +18,12 @@ import numpy as np
 from numpy.typing import NDArray
 
 from curated.ledger import SpendLedger
-from curated.settings import require_env
+from curated.settings import Models, require_env
 
 BASE_URL = "https://openrouter.ai/api/v1"
+DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions"
+"""Decision models, outside `/api/v1`; OpenRouter marks the endpoint alpha."""
+DEFAULT_DECIDER = Models.fallback_decider
 PROVIDER = "openrouter"
 MAX_RETRIES = 4
 FIRST_BACKOFF_SECONDS = 2.0
@@ -96,15 +99,16 @@ def _retry_after_seconds(value: str) -> float:
 
 
 class OpenRouterClient:
-    def __init__(self, *, http: httpx.AsyncClient, ledger: SpendLedger) -> None:
+    def __init__(self, *, http: httpx.AsyncClient, ledger: SpendLedger, decider: str = DEFAULT_DECIDER) -> None:
         self._http = http
         self._ledger = ledger
+        self._decider = decider
 
     @classmethod
     @asynccontextmanager
-    async def connect(cls, ledger: SpendLedger) -> AsyncIterator[OpenRouterClient]:
+    async def connect(cls, ledger: SpendLedger, decider: str = DEFAULT_DECIDER) -> AsyncIterator[OpenRouterClient]:
         async with connect_http() as http:
-            yield cls(http=http, ledger=ledger)
+            yield cls(http=http, ledger=ledger, decider=decider)
 
     async def complete_json(
         self,
@@ -163,6 +167,13 @@ class OpenRouterClient:
         if not content:
             raise OpenRouterError(f"{model} returned no content: {json.dumps(payload)[:500]}")
         return json.loads(content), float(payload.get("usage", {}).get("cost") or 0.0)
+
+    async def decide(self, state: Any, questions: Mapping[str, dict[str, Any]], *, purpose: str) -> dict[str, float]:
+        """Asks the fallback decision model each named yes-or-no question, and returns the probability of yes for
+        each. Perplexity's decision model reads an image only as a top-level item of a list state."""
+        body = {"model": self._decider, "state": state, "questions": dict(questions)}
+        payload = await self._post(DECISIONS_URL, body, model=self._decider, purpose=purpose)
+        return {name: float(payload["answers"][name]["noul"]) for name in questions}
 
     async def embed_texts(
         self, texts: Sequence[str], *, model: str, dimensions: int, purpose: str

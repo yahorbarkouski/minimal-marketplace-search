@@ -17,11 +17,13 @@ from pathlib import Path
 from typesafe_sdk import Asset, Image, JSONContent, Noul, TypeSafeError
 
 from curated.domain import ProductId
+from curated.ledger import BudgetExceededError
 from curated.providers.jev import JevAsker
-from curated.providers.perplexity import PerplexityError
+from curated.providers.openrouter import OpenRouterError
 from curated.providers.protocols import Decider
 
 GATE_STATEMENT = "Product {key} is a convincing answer to buyer_search."
+PHOTO_LABEL = "Photo of {key}:"
 GATE_DEFINITIONS = {
     "central point": (
         "what defines the purchase: the kind of product, and whichever of these the search names: brand or model, "
@@ -121,22 +123,27 @@ async def _ask_fallback(
     cards: Mapping[ProductId, str],
     photos: Callable[[ProductId], Path],
 ) -> dict[ProductId, float]:
-    """Asks the same questions of the fallback decision model, with each photo inside the state as a data URL."""
+    """Asks the fallback decision model the same questions. It reads images only as top-level items of a list, so the
+    state comes first and each photo follows the label its product's card points to."""
     products = {
-        key: {"card": cards[product_id], "photo": _image_part(photos(product_id))} for key, product_id in keys.items()
+        key: {"card": cards[product_id], "photo": f"the image after {PHOTO_LABEL.format(key=key)!r}"}
+        for key, product_id in keys.items()
     }
+    listed: list[JSONContent] = [{**state, "products": products}]
+    for key, product_id in keys.items():
+        listed += [PHOTO_LABEL.format(key=key), _image_part(photos(product_id))]
     asked = {
         key: {"type": "noul", "instructions": question.instructions, "criteria": question.criteria}
         for key, question in questions.items()
     }
     try:
-        answers = await fallback.decide({**state, "products": products}, asked, purpose="gate candidates (fallback)")
-    except (PerplexityError, OSError) as error:
+        answers = await fallback.decide(listed, asked, purpose="gate candidates (fallback)")
+    except (OpenRouterError, BudgetExceededError, OSError) as error:
         print(f"[search] fallback gate call failed for {len(keys)} products: {error!r}", file=sys.stderr)
         return dict.fromkeys(keys.values(), 0.0)
     return {product_id: answers[key] for key, product_id in keys.items()}
 
 
-def _image_part(path: Path) -> dict[str, object]:
+def _image_part(path: Path) -> dict[str, JSONContent]:
     encoded = base64.b64encode(path.read_bytes()).decode("ascii")
     return {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded}"}}

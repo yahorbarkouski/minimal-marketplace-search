@@ -26,9 +26,8 @@ class Models:
     embedding_dimensions: int = 768
     jev: str | None = None  # TypeSafe's default, jev-latest
     jev_usd_per_million_input_tokens: float = 0.042
-    fallback_decider: str = "pplx-decider-latest"
-    """Perplexity's decision model, which the gate asks when TypeSafe's fails and PERPLEXITY_API_KEY is set."""
-    fallback_decider_usd_per_million_input_tokens: float = 0.02
+    fallback_decider: str = "perplexity/pplx-decider-v1.2"
+    """Perplexity's decision model on OpenRouter, which the gate asks when TypeSafe's call fails."""
 
 
 @dataclass(frozen=True)

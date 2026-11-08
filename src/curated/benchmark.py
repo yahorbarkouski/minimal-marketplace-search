@@ -25,7 +25,6 @@ from curated.cache import cache_key
 from curated.ledger import open_daily
 from curated.providers.jev import JevClient
 from curated.providers.openrouter import OpenRouterClient
-from curated.providers.perplexity import PerplexityDecider
 from curated.runlog import Run
 from curated.search.searcher import Searcher, SearchIndex
 from curated.settings import Settings
@@ -102,15 +101,14 @@ async def run_benchmark(settings: Settings, *, searches: Path, name: str, limit:
     ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
     wanted = load_searches(searches)
     async with (
-        OpenRouterClient.connect(ledger) as openrouter,
+        OpenRouterClient.connect(ledger, settings.models.fallback_decider) as openrouter,
         JevClient.connect(ledger, settings.models) as jev,
-        PerplexityDecider.connect(ledger, settings.models) as fallback,
     ):
         with Run(str(directory), config=run_config(settings), max_cost=BENCHMARK_CAP_USD) as run:
             for item in run.todo(wanted, id_of=lambda row: row["search"], limit=limit):
                 before = ledger.total_usd
                 # A searcher of its own, so no search finds its interpretation cached.
-                searcher = Searcher(index, settings=settings, openrouter=openrouter, jev=jev, fallback=fallback)
+                searcher = Searcher(index, settings=settings, openrouter=openrouter, jev=jev, fallback=openrouter)
                 try:
                     trace, _ = await searcher.begin(item["search"], on_first_results=lambda _: None)
                 except Exception as error:

@@ -15,15 +15,13 @@ The repository comes with an example catalogue, the 1,301 products of [curated.s
 
 ## Quick start
 
-You need [uv](https://docs.astral.sh/uv/), [bun](https://bun.sh) and two API keys: one from [TypeSafe](https://typesafe.ai) for its decision model, which answers yes-or-no questions with a probability, and one from [OpenRouter](https://openrouter.ai) for the Gemini and GPT-6 Luna models.
+You need [uv](https://docs.astral.sh/uv/), [bun](https://bun.sh) and two API keys: one from [TypeSafe](https://typesafe.ai) for its decision model, which answers yes-or-no questions with a probability, and one from [OpenRouter](https://openrouter.ai) for the Gemini and GPT-6 Luna models and Perplexity's decision model, which judges the products when a call to TypeSafe's fails.
 
 ```bash
 cp .env.example .env   # then fill in both keys
 uv sync
 uv run curated download
 ```
-
-Optionally, add `PERPLEXITY_API_KEY` from [Perplexity](https://docs.perplexity.ai/docs/decisions): when a call to TypeSafe's decision model fails, Perplexity's decision model judges those products in its place.
 
 `curated download` fetches the example catalogue with its index built, 23 MB compressed, and checks it against `data-release.sha256` before unpacking. Then start the search server and the site, each in its own terminal:
 
@@ -116,7 +114,7 @@ These are the models the search uses as of November 2026, each with what was mea
 | Job | Model | Measured |
 | --- | --- | --- |
 | Judging products, and reading the search | TypeSafe's decision model | Reads 6 products with their photos per call for about $0.00024; 78% good in the first ten on the benchmark |
-| Judging products when that fails | Perplexity's `pplx-decider-latest` | $0.02 per million input tokens; quality not yet benchmarked |
+| Judging products when that fails | Perplexity's decision model on OpenRouter, `perplexity/pplx-decider-v1.2` | On `slim wallet that is not leather` with TypeSafe's calls failing, it returned 12 products with the same top three, and the search cost $0.0020 against $0.0045; not yet benchmarked |
 | Interpretation | Gemini 3.5 Flash-Lite | Within its 2.5 s limit on all 40 benchmark searches |
 | Price limit | Gemini 3.8 Flash | Not compared with other models |
 | Vectors | Gemini Embedding 2, 768 dimensions | Not compared with other models |

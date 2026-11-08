@@ -38,7 +38,6 @@ from curated.ledger import BudgetExceededError, open_daily
 from curated.limits import RateLimit, visitor_address, wait_message
 from curated.providers.jev import JevClient
 from curated.providers.openrouter import OpenRouterClient
-from curated.providers.perplexity import PerplexityDecider
 from curated.search.searcher import Continuation, Searcher, SearchIndex
 from curated.settings import Settings
 from curated.shared_spend import SharedSpend
@@ -107,12 +106,11 @@ def connect_demo(settings: Settings) -> DemoFactory:
     async def open_demo() -> AsyncIterator[Demo]:
         ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
         async with (
-            OpenRouterClient.connect(ledger) as openrouter,
+            OpenRouterClient.connect(ledger, settings.models.fallback_decider) as openrouter,
             JevClient.connect(ledger, settings.models) as jev,
-            PerplexityDecider.connect(ledger, settings.models) as fallback,
         ):
             searcher = Searcher(
-                SearchIndex.load(settings), settings=settings, openrouter=openrouter, jev=jev, fallback=fallback
+                SearchIndex.load(settings), settings=settings, openrouter=openrouter, jev=jev, fallback=openrouter
             )
             shared = SharedSpend(ledger) if os.environ.get(BLOB_TOKEN) else None
             yield Demo(searcher=searcher, settings=settings, readings=load_readings(settings), shared_spend=shared)
