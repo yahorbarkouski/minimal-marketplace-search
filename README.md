@@ -4,7 +4,7 @@ Natural-language search for a product catalogue. A buyer types what they want in
 
 The search server is one Python process and a set of files, about 35 MB for 1,301 products, which it loads into memory at startup. It calls two model APIs and needs no database or search service. The site is a small Next.js app on top.
 
-The repository comes with an example catalogue, the 1,301 products of [curated.supply](https://www.curated.supply/browse), used with its owner's permission:
+The repository comes with an example catalogue, the 1,301 products of [curated.supply](https://www.curated.supply/browse), used with its owner's permission. The demo at [curated-supply-search.vercel.app](https://curated-supply-search.vercel.app) searches it:
 
 | Search | First three products |
 | --- | --- |
