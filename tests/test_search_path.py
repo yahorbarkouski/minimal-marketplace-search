@@ -1,6 +1,7 @@
 """The query path and the server on the real catalogue's shape, with stand-ins for Jev and the model provider."""
 
 import json
+import os
 from dataclasses import replace
 from pathlib import Path
 from typing import ClassVar
@@ -192,10 +193,11 @@ def test_files_keep_one_spelling_for_unicode_slugs(tmp_path: Path) -> None:
     assert sitemap_urls("<loc>a</loc><loc>b</loc><loc>a</loc>") == ["a", "b"]
 
 
-def test_the_env_file_sets_the_budget_and_overrides_the_environment(
+def test_the_env_file_sets_the_keys_and_overrides_the_environment(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("CURATED_ROOT", str(tmp_path))
-    monkeypatch.setenv("CURATED_BUDGET_USD", "99")
-    (tmp_path / ".env").write_text("# a comment\nCURATED_BUDGET_USD=3\nEMPTY=\n", encoding="utf-8")
-    assert _settings().budget_usd == 3
+    monkeypatch.setenv("OPENROUTER_API_KEY", "from-shell")
+    (tmp_path / ".env").write_text("# a comment\nOPENROUTER_API_KEY=from-file\nEMPTY=\n", encoding="utf-8")
+    _settings()
+    assert os.environ["OPENROUTER_API_KEY"] == "from-file"

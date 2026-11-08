@@ -107,14 +107,15 @@ def ledger_at(tmp_path: Path, name: str, cap: float = 5.0) -> SpendLedger:
 async def test_two_instances_share_one_total_and_the_cap_holds(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     blobs = FakeBlobs(monkeypatch)
     first, second = ledger_at(tmp_path, "a.jsonl"), ledger_at(tmp_path, "b.jsonl")
-    sharing_first = SharedSpend(first, spent_before_usd=4.0)
-    sharing_second = SharedSpend(second, spent_before_usd=4.0)
+    blobs.names.append("spend/earlier-4.000000.txt")
+    sharing_first = SharedSpend(first)
+    sharing_second = SharedSpend(second)
 
     await sharing_first.refresh()
     assert first.total_usd == pytest.approx(4.0)
     first.record(provider="p", model="m", purpose="search", cost_usd=0.6)
     await sharing_first.share()
-    assert len(blobs.names) == 1
+    assert len(blobs.names) == 2
 
     await sharing_second.refresh()
     assert second.total_usd == pytest.approx(4.6)
@@ -130,7 +131,7 @@ async def test_two_instances_share_one_total_and_the_cap_holds(tmp_path: Path, m
 async def test_sharing_twice_counts_once(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     blobs = FakeBlobs(monkeypatch)
     ledger = ledger_at(tmp_path, "a.jsonl")
-    sharing = SharedSpend(ledger, spent_before_usd=0.0)
+    sharing = SharedSpend(ledger)
     await sharing.refresh()
     ledger.record(provider="p", model="m", purpose="search", cost_usd=0.25)
     await asyncio.gather(sharing.share(), sharing.share())
@@ -161,7 +162,7 @@ async def test_instances_share_only_todays_spend(tmp_path: Path, monkeypatch: py
     blobs = FakeBlobs(monkeypatch)
     blobs.names.append("spend/2020-01-01/old-9.000000.txt")
     ledger = SpendLedger.open(tmp_path / "a.jsonl", 5.0, daily=True)
-    sharing = SharedSpend(ledger, spent_before_usd=0.0)
+    sharing = SharedSpend(ledger)
     await sharing.refresh()
     assert ledger.total_usd == 0
     ledger.record(provider="p", model="m", purpose="search", cost_usd=0.25)

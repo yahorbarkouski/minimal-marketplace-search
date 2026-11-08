@@ -67,6 +67,11 @@ class SpendLedger:
                 print(f"[ledger] spend passed ${threshold:.2f} of ${self.cap_usd:.2f}", file=sys.stderr)
 
 
+def open_daily(path: Path, cap_usd: float) -> SpendLedger:
+    """The ledger every command and the server use: today's spend against the daily budget."""
+    return SpendLedger.open(path, cap_usd, daily=True)
+
+
 def spend_by_purpose(path: Path) -> dict[str, float]:
     totals: dict[str, float] = {}
     if path.exists():

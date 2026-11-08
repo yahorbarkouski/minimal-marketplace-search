@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from curated.cache import cache_key
-from curated.ledger import SpendLedger
+from curated.ledger import open_daily
 from curated.providers.jev import JevClient
 from curated.providers.openrouter import OpenRouterClient
 from curated.runlog import Run
@@ -98,7 +98,7 @@ async def run_benchmark(settings: Settings, *, searches: Path, name: str, limit:
     """Runs the searches not yet saved under `name`, one at a time, so each time is the time of one search."""
     directory = run_directory(settings, name)
     index = SearchIndex.load(settings)
-    ledger = SpendLedger.open(settings.ledger_path, settings.budget_usd)
+    ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
     wanted = load_searches(searches)
     async with OpenRouterClient.connect(ledger) as openrouter, JevClient.connect(ledger, settings.models) as jev:
         with Run(str(directory), config=run_config(settings), max_cost=BENCHMARK_CAP_USD) as run:

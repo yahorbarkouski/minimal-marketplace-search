@@ -19,7 +19,7 @@ from curated.deployment import create_site
 from curated.indexing.build import build_index
 from curated.indexing.reading import load_readings, read_products, sample_per_category, write_readings
 from curated.indexing.taxonomy_writer import write_taxonomy
-from curated.ledger import SpendLedger, spend_by_purpose
+from curated.ledger import open_daily, spend_by_purpose
 from curated.providers.jev import JevClient
 from curated.providers.openrouter import OpenRouterClient
 from curated.scrape import scrape as scrape_site
@@ -70,7 +70,7 @@ def read(
         products = sample_per_category(products, per_category)
 
     async def run() -> None:
-        ledger = SpendLedger.open(settings.ledger_path, settings.budget_usd)
+        ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
         async with OpenRouterClient.connect(ledger) as client:
             await read_products(products, settings=settings, client=client, max_cost=max_cost)
 
@@ -84,7 +84,7 @@ def taxonomy() -> None:
     settings = _settings()
 
     async def run() -> None:
-        ledger = SpendLedger.open(settings.ledger_path, settings.budget_usd)
+        ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
         async with OpenRouterClient.connect(ledger) as client:
             written = await write_taxonomy(
                 load_products(settings), load_readings(settings), settings=settings, client=client
@@ -102,7 +102,7 @@ def index(
     settings = _settings()
 
     async def run() -> None:
-        ledger = SpendLedger.open(settings.ledger_path, settings.budget_usd)
+        ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
         async with (
             OpenRouterClient.connect(ledger) as openrouter,
             JevClient.connect(ledger, settings.models) as jev,
@@ -134,12 +134,13 @@ def package(out: str = typer.Option("dist", help="The folder to write the data f
 
 @app.command()
 def spend() -> None:
-    """Print what the ledger holds, by purpose."""
+    """Print what the ledger holds, by purpose, and today's spend against the daily budget."""
     settings = _settings()
     totals = spend_by_purpose(settings.ledger_path)
     for purpose, total in sorted(totals.items(), key=lambda item: -item[1]):
         typer.echo(f"{purpose}: ${total:.4f}")
-    typer.echo(f"total: ${sum(totals.values()):.4f} of ${settings.budget_usd:.2f}")
+    today = open_daily(settings.ledger_path, settings.daily_budget_usd).total_usd
+    typer.echo(f"total: ${sum(totals.values()):.4f}; today: ${today:.4f} of ${settings.daily_budget_usd:.2f}")
 
 
 @app.command()

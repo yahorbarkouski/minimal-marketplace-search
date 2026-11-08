@@ -34,7 +34,7 @@ from curated.debug_view import describe_search
 from curated.domain import Product, ProductId, Reading, SearchTrace
 from curated.indexing.card import price_line
 from curated.indexing.reading import load_readings
-from curated.ledger import BudgetExceededError, SpendLedger
+from curated.ledger import BudgetExceededError, open_daily
 from curated.limits import RateLimit, visitor_address, wait_message
 from curated.providers.jev import JevClient
 from curated.providers.openrouter import OpenRouterClient
@@ -104,19 +104,13 @@ def connect_demo(settings: Settings) -> DemoFactory:
 
     @asynccontextmanager
     async def open_demo() -> AsyncIterator[Demo]:
-        daily = settings.daily_budget_usd
-        cap = settings.budget_usd if daily is None else daily
-        ledger = SpendLedger.open(settings.ledger_path, cap, daily=daily is not None)
+        ledger = open_daily(settings.ledger_path, settings.daily_budget_usd)
         async with (
             OpenRouterClient.connect(ledger) as openrouter,
             JevClient.connect(ledger, settings.models) as jev,
         ):
             searcher = Searcher(SearchIndex.load(settings), settings=settings, openrouter=openrouter, jev=jev)
-            shared = (
-                SharedSpend(ledger, spent_before_usd=settings.spent_before_usd if daily is None else 0.0)
-                if os.environ.get(BLOB_TOKEN)
-                else None
-            )
+            shared = SharedSpend(ledger) if os.environ.get(BLOB_TOKEN) else None
             yield Demo(searcher=searcher, settings=settings, readings=load_readings(settings), shared_spend=shared)
 
     return open_demo
@@ -130,8 +124,7 @@ def create_app(open_demo: DemoFactory) -> FastAPI:
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         async with open_demo() as demo:
             state["demo"] = demo
-            if demo.settings.searches_per_hour is not None:
-                limits["visitor"] = RateLimit(demo.settings.searches_per_hour)
+            limits["visitor"] = RateLimit(demo.settings.searches_per_hour)
             yield
 
     app = FastAPI(title="Curated", lifespan=lifespan)

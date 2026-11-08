@@ -21,11 +21,10 @@ def amount_of(pathname: str) -> float:
 
 
 class SharedSpend:
-    """Keeps the instance's ledger at the total across all instances, on top of what was spent before deploying."""
+    """Keeps the instance's ledger at the total across all instances."""
 
-    def __init__(self, ledger: SpendLedger, *, spent_before_usd: float) -> None:
+    def __init__(self, ledger: SpendLedger) -> None:
         self._ledger = ledger
-        self._spent_before = spent_before_usd
         self._synced = ledger.total_usd
 
     def _prefix(self) -> str:
@@ -33,7 +32,7 @@ class SharedSpend:
 
     async def refresh(self) -> None:
         """Brings the ledger up to the shared total. A failure stops the search, so an outage can't lift the cap."""
-        total = self._spent_before
+        total = 0.0
         async for blob in query_blobs(prefix=self._prefix()):
             total += amount_of(blob.pathname)
         # A daily ledger may just have started a new day, which leaves nothing to share.
