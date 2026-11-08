@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any, Protocol
 
 import numpy as np
@@ -28,6 +28,14 @@ class TextEmbedder(Protocol):
     async def embed_texts(
         self, texts: Sequence[str], *, model: str, dimensions: int, purpose: str
     ) -> NDArray[np.float32]: ...
+
+
+class Decider(Protocol):
+    """A decision model that answers named yes-or-no questions about a state with probabilities."""
+
+    async def decide(
+        self, state: Any, questions: Mapping[str, dict[str, Any]], *, purpose: str
+    ) -> dict[str, float]: ...
 
 
 class QueryModels(JsonCompleter, TextEmbedder, Protocol):

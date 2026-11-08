@@ -98,7 +98,7 @@ def taxonomy() -> None:
 def index(
     max_cost: float = typer.Option(DEFAULT_JOB_CAP, help="Stop once the tagging run has spent this many dollars."),
 ) -> None:
-    """Build the cards, the embeddings and Jev's tags; a rerun pays only for what changed."""
+    """Build the cards, the embeddings and the decision model's tags; a rerun pays only for what changed."""
     settings = _settings()
 
     async def run() -> None:

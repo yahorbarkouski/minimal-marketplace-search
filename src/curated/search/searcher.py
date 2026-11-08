@@ -44,7 +44,7 @@ from curated.indexing.embeddings import embed_interpretation, embed_query
 from curated.indexing.photos import gate_photo_path
 from curated.indexing.tagging import ProductTags
 from curated.providers.jev import JevAsker
-from curated.providers.protocols import QueryModels
+from curated.providers.protocols import Decider, QueryModels
 from curated.search.arms import FacetArm, KeywordArm, VectorArm
 from curated.search.expansion import expand
 from curated.search.fusion import reciprocal_rank_fusion
@@ -136,11 +136,20 @@ class Continuation:
 
 
 class Searcher:
-    def __init__(self, index: SearchIndex, *, settings: Settings, openrouter: QueryModels, jev: JevAsker) -> None:
+    def __init__(
+        self,
+        index: SearchIndex,
+        *,
+        settings: Settings,
+        openrouter: QueryModels,
+        jev: JevAsker,
+        fallback: Decider | None = None,
+    ) -> None:
         self._index = index
         self._settings = settings
         self._openrouter = openrouter
         self._jev = jev
+        self._fallback = fallback
         self._interpretations = InterpretationCache(settings.sizes.interpretation_cache_size)
 
     @property
@@ -430,6 +439,7 @@ class Searcher:
             products_per_call=self._settings.sizes.gate_products_per_call,
             photos=lambda product_id: gate_photo_path(self._settings.gate_photos_dir, product_id),
             interpretation=interpretation,
+            fallback=self._fallback,
         )
 
 
