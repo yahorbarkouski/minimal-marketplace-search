@@ -1,16 +1,18 @@
 # Minimal marketplace search
 
-Natural-language search for a product catalogue. A buyer types what they want in their own words, and the search returns the matching products, best first. A search takes about 1.7 seconds and costs about half a cent.
+Minimal marketplace search is a lightweight natural-language search for any product catalogue, built on [decision models](#how-a-search-works). Type what you're after the way you'd say it (a Bond villain's desk, a slim wallet that isn't leather, an espresso machine under $1000), and it finds the products that fit, reading every product's photo as well as its text. A search takes under two seconds and costs about half a cent, and the whole search runs in one Python process that keeps its index in memory.
 
-The search server is one Python process and a set of files, about 35 MB for 1,301 products, which it loads into memory at startup. It calls two model APIs and needs no database or search service. The site is a small Next.js app on top.
+**[Try the demo](https://curated-supply-search.vercel.app)** · **[Run it](#quick-start)** with uv, bun and two API keys
 
-The repository comes with an example catalogue, the 1,301 products of [curated.supply](https://www.curated.supply/browse), used with its owner's permission. The demo at [curated-supply-search.vercel.app](https://curated-supply-search.vercel.app) searches it:
+![Typing "a Bond villain's desk" into the search box brings up an Omega Seamaster, Geistmaschine's Bauwerk and a Herman Miller gaming desk, then "slim wallet that is not leather" brings up aluminium cardholders from Ekster, Ridge and The James Brand](docs/readme/search.gif)
+
+It comes with an example catalogue, the 1,301 products of [curated.supply](https://www.curated.supply/browse), used with its owner's permission:
 
 | Search | First three products |
 | --- | --- |
 | `espresso machine under $1000` | Terra Kaffe Demi ($795), Breville Barista Express ($700), Wacaco Minipresso GR2 ($60) |
 | `slim wallet that is not leather` | Ekster Aluminum Cardholder Wallet, Ridge Gunmetal Aluminum Wallet, The James Brand The Lowe |
-| `a Bond villain's desk` | Transparent Brutalist Speaker, Herman Miller Coyl Gaming Desk, Geistmaschine Bauwerk |
+| `a Bond villain's desk` | Omega Seamaster Diver 300M, Geistmaschine Bauwerk, Herman Miller Coyl Gaming Desk |
 | `something Dieter Rams would own` | Vitsoe 606 Universal Shelving System, Braun BNE001 Calculator, Braun BC17 Wall Clock |
 
 ## Quick start
